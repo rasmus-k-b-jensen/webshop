@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  passwordHash  String
+  role          String   @default("CUSTOMER")
+  creditBalance Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  orders              Order[]
+  creditTransactions  CreditTransaction[]
+  createdTransactions CreditTransaction[] @relation("TransactionCreator")
+  addresses           Address[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  description     String
+  imageUrl        String?
+  priceInCredits  Int
+  stock           Int?     // null means unlimited
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  orderItems OrderItem[]
+
+  @@index([isActive])
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  customerId   String
+  totalCredits Int
+  status       String      @default("PENDING")
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  
+  // Shipping information
+  shippingName        String
+  shippingAddressLine1 String
+  shippingAddressLine2 String?
+  shippingCity         String
+  shippingState        String?
+  shippingPostalCode   String
+  shippingCountry      String
+  
+  // Fulfillment tracking
+  trackingNumber       String?
+  shippedAt            DateTime?
+  deliveredAt          DateTime?
+  
+  // Gift options
+  isGift               Boolean  @default(false)
+  giftMessage          String?
+
+  // Relations
+  customer           User                @relation(fields: [customerId], references: [id])
+  items              OrderItem[]
+  creditTransaction  CreditTransaction?
+
+  @@index([customerId])
+  @@index([createdAt])
+  @@index([status])
+}
+
+model OrderItem {
+  id                        String @id @default(cuid())
+  orderId                   String
+  productId                 String
+  quantity                  Int
+  priceInCreditsAtPurchase  Int
+
+  // Relations
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model CreditTransaction {
+  id              String              @id @default(cuid())
+  customerId      String
+  amount          Int                 // positive for added, negative for spent
+  type            String
+  reason          String
+  relatedOrderId  String?             @unique
+  createdAt       DateTime            @default(now())
+  createdByUserId String?
+
+  // Relations
+  customer      User   @relation(fields: [customerId], references: [id])
+  createdBy     User?  @relation("TransactionCreator", fields: [createdByUserId], references: [id])
+  relatedOrder  Order? @relation(fields: [relatedOrderId], references: [id])
+
+  @@index([customerId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Address {
+  id            String   @id @default(cuid())
+  userId        String
+  name          String   // Recipient name
+  addressLine1  String
+  addressLine2  String?
+  city          String
+  state         String?
+  postalCode    String
+  country       String
+  isDefault     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([isDefault])
+}
