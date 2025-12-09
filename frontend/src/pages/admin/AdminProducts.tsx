@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { productApi } from '../../api/products';
 import { Product } from '../../types';
 
@@ -70,7 +69,7 @@ const AdminProducts: React.FC = () => {
       description: product.description,
       imageUrl: product.imageUrl || '',
       priceInCredits: product.priceInCredits,
-      stock: product.stock,
+      stock: product.stock ?? null,
       isActive: product.isActive,
     });
     setShowForm(true);

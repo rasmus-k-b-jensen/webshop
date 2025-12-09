@@ -79,7 +79,6 @@ const Checkout: React.FC = () => {
 
     try {
       let shippingAddressId = selectedAddressId;
-      let shippingAddress = undefined;
 
       // If using new address, create it first
       if (showNewAddressForm) {

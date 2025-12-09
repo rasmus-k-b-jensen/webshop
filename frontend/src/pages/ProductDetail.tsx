@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { productApi } from '../api/products';
-import { orderApi } from '../api/orders';
 import { Product } from '../types';
 import { useAuth } from '../context/AuthContext';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, refreshUser } = useAuth();
+  const { user } = useAuth();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [purchasing, setPurchasing] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [quantity] = useState(1);
 
   useEffect(() => {
@@ -75,7 +72,7 @@ const ProductDetail: React.FC = () => {
             )}
           </div>
 
-          {product.stock !== null && (
+          {product.stock !== null && product.stock !== undefined && (
             <p className="mb-3">
               <strong>Availability:</strong>{' '}
               {product.stock > 0 ? (

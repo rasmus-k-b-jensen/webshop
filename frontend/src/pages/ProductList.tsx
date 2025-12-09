@@ -76,7 +76,7 @@ const ProductList: React.FC = () => {
                   
                   <div className="product-price">{product.priceInCredits} Credits</div>
 
-                  {product.stock !== null && (
+                  {product.stock !== null && product.stock !== undefined && (
                     <p className="product-stock">
                       {product.stock > 0 ? (
                         <span className="text-success">
@@ -92,7 +92,7 @@ const ProductList: React.FC = () => {
                     <Link
                       to={`/products/${product.id}`}
                       className={`btn btn-block ${
-                        canAfford(product.priceInCredits) && (product.stock === null || product.stock > 0)
+                        canAfford(product.priceInCredits) && (product.stock === null || product.stock === undefined || product.stock > 0)
                           ? 'btn-primary'
                           : 'btn-secondary'
                       }`}

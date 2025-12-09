@@ -20,7 +20,7 @@ const AdminOrders: React.FC = () => {
       const response = await orderApi.getAll(statusFilter);
       if (response.success && response.data) {
         setOrders(response.data);
-        setTotal(response.total || response.data.length);
+        setTotal((response as any).total || response.data.length);
       }
     } catch (err: any) {
       setError('Failed to load orders');
