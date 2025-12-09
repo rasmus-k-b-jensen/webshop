@@ -89,18 +89,15 @@ const ProductDetail: React.FC = () => {
           </div>
 
           {error && <div className="alert alert-error">{error}</div>}
-          {success && <div className="alert alert-success">{success}</div>}
 
           <div className="flex gap-2">
             <button
               onClick={handlePurchase}
-              disabled={!canPurchase || purchasing}
+              disabled={!canPurchase}
               className="btn btn-primary"
               style={{ flex: 1 }}
             >
-              {purchasing
-                ? 'Processing...'
-                : !canAfford
+              {!canAfford
                 ? 'Insufficient Credits'
                 : product.stock === 0
                 ? 'Out of Stock'
