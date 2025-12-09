@@ -1,5 +1,6 @@
 import express, { Application } from 'express';
 import cors from 'cors';
+import path from 'path';
 import { config } from './config';
 import { errorHandler } from './middleware/error.middleware';
 
@@ -32,6 +33,17 @@ app.use('/api/credits', creditRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/addresses', addressRoutes);
+
+// Serve static frontend files in production
+if (config.nodeEnv === 'production') {
+  const frontendPath = path.join(__dirname, '../../frontend/dist');
+  app.use(express.static(frontendPath));
+  
+  // All non-API routes serve the React app
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  });
+}
 
 // Error handler (must be last)
 app.use(errorHandler);
